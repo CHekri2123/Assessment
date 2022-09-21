@@ -59,14 +59,16 @@
         <v-simple-table fixed-header>
           <thead>
             <tr>
-              <th class="text-left">Id</th>
-              <th class="text-left">Customer Id</th>
+              <th class="text-left">Id
+                <v-icon @click="SortAscending(val='id')">mdi-arrow-up</v-icon>
+                <v-icon @click="SortDescending(val='id')">mdi-arrow-down</v-icon>
+              </th>
+              <th class="text-left">Customer Id
+                <v-icon @click="SortAscending(val='customer_id')">mdi-arrow-up</v-icon>
+                <v-icon @click="SortDescending(val='customer_id')">mdi-arrow-down</v-icon>
+              </th>
               <th class="text-left">Hotel Name</th>
-              <th class="text-left">Door No</th>
-              <th class="text-left">Street</th>
-              <th class="text-left">Landmark</th>
-              <th class="text-left">City</th>
-              <th class="text-left">Pincode</th>
+              <th class="text-left">Address</th>
               <th class="text-left">Actions</th>
             
             </tr>
@@ -76,11 +78,7 @@
               <td>{{row.id}}</td>
               <td>{{row.customer_id}}</td>
               <td>{{row.hotel_name}}</td>
-              <td>{{row.door_no}}</td>
-              <td>{{row.street}}</td>
-              <td>{{row.landmark}}</td>
-              <td>{{row.city}}</td>
-              <td>{{row.pincode}}</td>
+              <td>{{address.address}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
                   <v-icon small>mdi-pencil</v-icon>
@@ -105,6 +103,7 @@ export default {
   name: "HotelCrud",
   data() {
     return {
+      address: {},
       id: '',
       customer_id: '',
       hotel_name:'',
@@ -126,6 +125,7 @@ export default {
 
   mounted() {
     this.read()
+    
   },
 
 
@@ -148,10 +148,12 @@ export default {
         city: this.city,
         pincode: this.pincode
       });
+      this.address = sub.data
       console.log('Printing submitted details when submit button pressed')
       console.log(sub);
       this.read();
       this.dialog = false;
+      this.$refs.form.reset()
     },
 
     press() {
@@ -212,6 +214,26 @@ export default {
       this.customerTable = searchPromise.data
       console.log(input)
     },
+
+    async SortAscending(val){
+      console.log('Up button clicked')
+      console.log(val)
+      axios.post(`http://127.0.0.1:3333/sortHotelDataAsc`,{
+        columnName: val
+      }).then(response => {
+        this.customerTable = response.data
+      })
+    },
+
+    async SortDescending(val){
+      console.log('Down button clicked')
+      axios.post(`http://127.0.0.1:3333/sortHotelDataDesc`,{
+        columnName: val
+      }).then(response => {
+        this.hotelTable = response.data
+      })
+    },
+
   },
 
 }

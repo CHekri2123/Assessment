@@ -46,22 +46,15 @@ export default class CustomersController {
         return searchData
     }
 
-    public async sortAscendingById() {
-        return Customer.query().orderBy("id", "asc")
+    public async sortAscending({ request }: HttpContext) {
+        const columnName = request.input('columnName')
+        const sort = await Database.from('customers').select('*').orderBy(`${columnName}`, `asc`)
+        return sort
     }
-    public async sortDescendingById() {
-        return Customer.query().orderBy("id", "desc")
-    }
-    public async sortAscendingByCustomerName() {
-        return Customer.query().orderBy("customer_name", "asc")
-    }
-    public async sortDescendingByCustomerName() {
-        return Customer.query().orderBy("customer_name", "desc")
-    }
-    public async sortAscendingByBranchName() {
-        return Customer.query().orderBy("branch_name", "asc")
-    }
-    public async sortDescendingByBranchName() {
-        return Customer.query().orderBy("branch_name", "desc")
+
+    public async sortDescending({ request }: HttpContext) {
+        const columnName = request.input('columnName')
+        const sort = await Database.from('customers').select('*').orderBy(`${columnName}`, `desc`)
+        return sort
     }
 }

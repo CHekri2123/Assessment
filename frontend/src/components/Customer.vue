@@ -42,9 +42,14 @@
         <v-simple-table fixed-header>
           <thead>
             <tr>
-              <th class="text-left">Id</th>
-              <th class="text-left">Customer Name</th>
-              <th class="text-left">Branch Name</th>
+              <th class="text-left">Id
+                <v-icon @click="SortAscending(val='id')">mdi-arrow-up</v-icon>
+                <v-icon @click="SortDescending(val='id')">mdi-arrow-down</v-icon>
+              </th>
+              <th class="text-left">Customer Name
+                <v-icon @click="SortAscending(val='customer_name')">mdi-arrow-up</v-icon>
+                <v-icon @click="SortDescending(val='customer_name')">mdi-arrow-down</v-icon>
+              </th>
               <th class="text-left">Actions</th>
               <th class="text-left">Count of Hotels</th>
             </tr>
@@ -53,7 +58,6 @@
             <tr v-for="row in customerTable" :key="row.id">
               <td>{{row.id}}</td>
               <td>{{row.customer_name}}</td>
-              <td>{{row.branch_name}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
                   <v-icon small>mdi-pencil</v-icon>
@@ -73,7 +77,8 @@
 <script>
 import axios from 'axios';
 var instanceOfItem;
-var instanceOfItem1;
+console.log("Hi")
+
 export default {
   name: "CustomerCrud",
   data() {
@@ -91,9 +96,9 @@ export default {
     };
   },
 
-
   mounted() {
     this.read()
+    console.log(this.customerTable)
   },
 
 
@@ -102,8 +107,9 @@ export default {
     read() {
       axios.get(process.env.VUE_APP_GET_LINK).then(response => {
         this.customerTable = response.data
+        console.log(typeof this.customerTable)
       })
-    },
+    },  
 
     async submit() {
       const sub = await axios.post(process.env.VUE_APP_POST_LINK, {
@@ -115,6 +121,7 @@ export default {
       console.log(sub);
       this.read();
       this.dialog = false;
+      this.$refs.form.reset()
     },
 
     press() {
@@ -159,6 +166,25 @@ export default {
       const searchPromise = await API.post('http://127.0.0.1:3333/searchCustomerData',{'term':input})
       this.customerTable = searchPromise.data
       console.log(input)
+    },
+
+    async SortAscending(val){
+      console.log('Up button clicked')
+      console.log(val)
+      axios.post(`http://127.0.0.1:3333/sortCustomerDataAsc`,{
+        columnName: val
+      }).then(response => {
+        this.customerTable = response.data
+      })
+    },
+
+    async SortDescending(val){
+      console.log('Down button clicked')
+      axios.post(`http://127.0.0.1:3333/sortCustomerDataDesc`,{
+        columnName: val
+      }).then(response => {
+        this.customerTable = response.data
+      })
     },
   },
 

@@ -3,10 +3,11 @@ import Database from "@ioc:Adonis/Lucid/Database"
 import Hoteldatabase from 'App/Models/Hoteldatabase'
 
 export default class HoteldatabasesController{
+
     public displayData() {
         return Database.from('hoteldatabases').select('*').orderBy('id')
     }
-    public async insertData({ request }: HttpContext) {
+    public async insertData({ request, response}: HttpContext) {
         const dataInsert = new Hoteldatabase()
         dataInsert.id = request.input('id')
         dataInsert.customer_id = request.input('customer_id')
@@ -17,7 +18,8 @@ export default class HoteldatabasesController{
         dataInsert.city = request.input('city')
         dataInsert.pincode = request.input('pincode')
         await dataInsert.save()
-        return dataInsert
+        const address = dataInsert.street +", "+ dataInsert.landmark +", "+ dataInsert.city +", "+ dataInsert.pincode
+        return response.json({address}) 
     }
     public async editData({ request }) {
         const editInsert = await Hoteldatabase.findByOrFail('id', request.params().id)
@@ -58,6 +60,18 @@ export default class HoteldatabasesController{
                     .orWhere("city", "ilike", `%${data}%`)
             })
         return searchData
+    }
+
+    public async sortAscending({ request }: HttpContext) {
+        const columnName = request.input('columnName')
+        const sort = await Database.from('hoteldatabases').select('*').orderBy(`${columnName}`, `asc`)
+        return sort
+    }
+
+    public async sortDescending({ request }: HttpContext) {
+        const columnName = request.input('columnName')
+        const sort = await Database.from('hoteldatabases').select('*').orderBy(`${columnName}`, `desc`)
+        return sort
     }
 
 }
