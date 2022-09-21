@@ -132,16 +132,21 @@ export default {
   methods: {
 
     read() {
-      axios.get(process.env.VUE_APP_GET_LINK).then(response => {
-        this.customerTable = response.data
+      axios.get(`http://127.0.0.1:3333/displayHotelData`).then(response => {
+        this.hotelTable = response.data
       })
     },
 
     async submit() {
-      const sub = await axios.post(process.env.VUE_APP_POST_LINK, {
+      const sub = await axios.post(`http://127.0.0.1:3333/insertHotelData`, {
         id: this.id,
-        customer_name: this.customer_name,
-        branch_name: this.branch_name
+        customer_id: this.customer_id,
+        hotel_name: this.hotel_name,
+        door_no: this.door_no,
+        street: this.street,
+        landmark: this.landmark,
+        city: this.city,
+        pincode: this.pincode
       });
       console.log('Printing submitted details when submit button pressed')
       console.log(sub);
@@ -158,8 +163,13 @@ export default {
       console.log(instanceOfItem);
       console.log('Pencil button clicked')
       this.id = row.id;
-      this.customer_name = row.customer_name;
-      this.branch_name = row.branch_name;
+      this.customer_id = row.customer_id;
+      this.hotel_name = row.hotel_name;
+      this.door_no = row.door_no;
+      this.street = row.street
+      this.landmark = row.landmark
+      this.city = row.city
+      this.pincode = row.pincode
       this.boolValue = false;
       this.dialog = true;
       this.submitButton = false;
@@ -170,14 +180,22 @@ export default {
       console.log("update button clicked")
       console.log(instanceOfItem)
       instanceOfItem.id = this.id
-      instanceOfItem.customer_name = this.customer_name
-      instanceOfItem.branch_name = this.branch_name
-      await axios.put(`${process.env.VUE_APP_PUT_LINK}/${instanceOfItem.customer_name}`, {
-        id: this.id,
-        customer_name: this.customer_name,
-        branch_name: this.branch_name
+      instanceOfItem.customer_id = this.customer_id
+      instanceOfItem.hotel_name = this.hotel_name
+      instanceOfItem.door_no = this.door_no
+      instanceOfItem.street = this.street
+      instanceOfItem.landmark = this.landmark
+      instanceOfItem.city = this.city
+      instanceOfItem.pincode = this.pincode
+      await axios.put(`http://127.0.0.1:3333/updateHotelData/${instanceOfItem.id}`, {
+        customer_id: this.customer_id,
+        hotel_name: this.hotel_name,
+        door_no : this.door_no,
+        street: this.street,
+        landmark: this.landmark,
+        city: this.city,
+        pincode: this.pincode
       });
-      
       this.$refs.form.reset()
       this.read()
       this.dialog = false;
@@ -185,17 +203,14 @@ export default {
 
 
     async deleteData(id) {
-      await axios.delete(`${process.env.VUE_APP_DELETE_LINK}/${id}`);
+      await axios.delete(`http://127.0.0.1:3333/deleteHotelData/${id}`);
       this.read();
     },
 
-    serachEmpDataReciever(value) {
-      this.table = value.data
-      console.log(value)
-    },
-    serachEmpDataReciever(value) {
-      this.customerTable = value.data
-      console.log(value)
+    async serachEmpDataReciever(input) {
+      const searchPromise = await API.post('http://127.0.0.1:3333/searchHotelData',{'term':input})
+      this.customerTable = searchPromise.data
+      console.log(input)
     },
   },
 

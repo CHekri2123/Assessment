@@ -46,6 +46,7 @@
               <th class="text-left">Customer Name</th>
               <th class="text-left">Branch Name</th>
               <th class="text-left">Actions</th>
+              <th class="text-left">Count of Hotels</th>
             </tr>
           </thead>
           <tbody>
@@ -139,12 +140,10 @@ export default {
       instanceOfItem.id = this.id
       instanceOfItem.customer_name = this.customer_name
       instanceOfItem.branch_name = this.branch_name
-      await axios.put(`${process.env.VUE_APP_PUT_LINK}/${instanceOfItem.customer_name}`, {
-        id: this.id,
+      await axios.put(`${process.env.VUE_APP_PUT_LINK}/${instanceOfItem.id}`, {
         customer_name: this.customer_name,
         branch_name: this.branch_name
       });
-      
       this.$refs.form.reset()
       this.read()
       this.dialog = false;
@@ -156,13 +155,10 @@ export default {
       this.read();
     },
 
-    serachEmpDataReciever(value) {
-      this.table = value.data
-      console.log(value)
-    },
-    serachEmpDataReciever(value) {
-      this.customerTable = value.data
-      console.log(value)
+    async serachEmpDataReciever(input) {
+      const searchPromise = await API.post('http://127.0.0.1:3333/searchCustomerData',{'term':input})
+      this.customerTable = searchPromise.data
+      console.log(input)
     },
   },
 

@@ -16,12 +16,10 @@ export default class CustomersController {
         return response.json({ dataInsert })
     }
     public async editData({ request }: HttpContext) {
-        const data = request.params().id
-        const editInsert = await Customer.query().where('customer_name', '=', data).update({
-            "id": request.input('id'),
-            "customer_name": request.input('customer_name'),
-            "branch_name": request.input('branch_name')
-        })  
+        const editInsert = await Customer.findByOrFail('id', request.params().id)
+        editInsert.customer_name = request.input('customer_name')
+        editInsert.branch_name = request.input('branch_name')
+        await editInsert.save()
         return editInsert
     }
     public async deleteData({ request }: HttpContext) {
