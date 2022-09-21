@@ -2,12 +2,12 @@ import { HttpContext } from '@adonisjs/core/build/standalone'
 import Database from "@ioc:Adonis/Lucid/Database"
 import Hoteldatabase from 'App/Models/Hoteldatabase'
 
-export default class HoteldatabasesController{
+export default class HoteldatabasesController {
 
     public displayData() {
         return Database.from('hoteldatabases').select('*').orderBy('id')
     }
-    public async insertData({ request, response}: HttpContext) {
+    public async insertData({ request, response }: HttpContext) {
         const dataInsert = new Hoteldatabase()
         dataInsert.id = request.input('id')
         dataInsert.customer_id = request.input('customer_id')
@@ -18,8 +18,8 @@ export default class HoteldatabasesController{
         dataInsert.city = request.input('city')
         dataInsert.pincode = request.input('pincode')
         await dataInsert.save()
-        const address = dataInsert.street +", "+ dataInsert.landmark +", "+ dataInsert.city +", "+ dataInsert.pincode
-        return response.json({address}) 
+        const address = dataInsert.street + ", " + dataInsert.landmark + ", " + dataInsert.city + ", " + dataInsert.pincode
+        return response.json({ address })
     }
     public async editData({ request }) {
         const editInsert = await Hoteldatabase.findByOrFail('id', request.params().id)

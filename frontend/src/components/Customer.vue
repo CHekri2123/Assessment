@@ -55,7 +55,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in customerTable" :key="row.id">
+            <tr v-for="row,index in customerTable" :key="row.id">
               <td>{{row.id}}</td>
               <td>{{row.customer_name}}</td>
               <td>
@@ -66,6 +66,7 @@
                   <v-icon small>mdi-delete</v-icon>
                 </v-btn>
               </td>
+              <td>{{countTable[index].count}}</td>
             </tr>
           </tbody>
         </v-simple-table>
@@ -83,6 +84,7 @@ export default {
   name: "CustomerCrud",
   data() {
     return {
+      countTable: [],
       id: '',
       customer_name: '',
       branch_name: '',
@@ -98,7 +100,7 @@ export default {
 
   mounted() {
     this.read()
-    console.log(this.customerTable)
+
   },
 
 
@@ -107,9 +109,14 @@ export default {
     read() {
       axios.get(process.env.VUE_APP_GET_LINK).then(response => {
         this.customerTable = response.data
-        console.log(typeof this.customerTable)
       })
-    },  
+      axios.get(`http://127.0.0.1:3333/count`).then(response => {
+        this.countTable = response.data
+      })
+      console.log("Printing count data")
+      console.log(this.countTable.count)
+      
+    },
 
     async submit() {
       const sub = await axios.post(process.env.VUE_APP_POST_LINK, {
@@ -138,7 +145,7 @@ export default {
       this.boolValue = false;
       this.dialog = true;
       this.submitButton = false;
-      
+
     },
 
     async edit() {
@@ -156,31 +163,31 @@ export default {
       this.dialog = false;
     },
 
-   
+
     async deleteData(id) {
       await axios.delete(`${process.env.VUE_APP_DELETE_LINK}/${id}`);
       this.read();
     },
 
     async serachEmpDataReciever(input) {
-      const searchPromise = await API.post('http://127.0.0.1:3333/searchCustomerData',{'term':input})
+      const searchPromise = await API.post('http://127.0.0.1:3333/searchCustomerData', { 'term': input })
       this.customerTable = searchPromise.data
       console.log(input)
     },
 
-    async SortAscending(val){
+    async SortAscending(val) {
       console.log('Up button clicked')
       console.log(val)
-      axios.post(`http://127.0.0.1:3333/sortCustomerDataAsc`,{
+      axios.post(`http://127.0.0.1:3333/sortCustomerDataAsc`, {
         columnName: val
       }).then(response => {
         this.customerTable = response.data
       })
     },
 
-    async SortDescending(val){
+    async SortDescending(val) {
       console.log('Down button clicked')
-      axios.post(`http://127.0.0.1:3333/sortCustomerDataDesc`,{
+      axios.post(`http://127.0.0.1:3333/sortCustomerDataDesc`, {
         columnName: val
       }).then(response => {
         this.customerTable = response.data

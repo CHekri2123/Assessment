@@ -15,7 +15,7 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-
+Route.get('/count','CustomersController.count')
 Route.get('/displayCustomerData','CustomersController.displayData')
 Route.post('/insertCustomerData','CustomersController.inserData')
 Route.put('/updateCustomerData/:id','CustomersController.editData')

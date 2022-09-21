@@ -3,6 +3,17 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import Customer from "App/Models/Customer"
 
 export default class CustomersController {
+
+    public async count({ }: HttpContext) {
+        const countData = Database
+            .from('customers')
+            .leftJoin('hoteldatabases', 'customers.id', '=', 'hoteldatabases.customer_id')
+            .groupBy('hoteldatabases.id')
+            .count('hoteldatabases.customer_id')
+        return countData
+    }
+
+
     public async displayData({ }: HttpContext) {
         const user = await Customer.all()
         return user
