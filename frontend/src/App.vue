@@ -1,9 +1,16 @@
 <template>
   <v-app>
+    <v-simple-table fixed-header>
+      <tr>
+        <v-col class="text-left">
+          <router-link to="/customer">Customer</router-link>
+        </v-col>
+        <v-col class="text-left">
+          <router-link to="/hotel">Hotel</router-link>
+        </v-col>
+      </tr>
+    </v-simple-table>
     <v-main>
-      <p>Welcome</p>
-      <p>/emp for employee table</p>
-      <p>/dept for department table</p>
       <router-view />
     </v-main>
   </v-app>

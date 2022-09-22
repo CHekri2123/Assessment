@@ -4,8 +4,28 @@ import Hoteldatabase from 'App/Models/Hoteldatabase'
 
 export default class HoteldatabasesController {
 
-    public displayData() {
-        return Database.from('hoteldatabases').select('*').orderBy('id')
+    public async address({ response }: HttpContext) {
+        // const add = await Database.rawQuery("select concat(street, ', ', landmark, ', ', city, ', ', pincode) as address from hoteldatabases")
+        // const data = add.rows
+        // return response.json({data})
+        const address = await Database
+            .from('hoteldatabases')
+            .select('street', 'landmark', 'city', 'pincode')
+        return response.json({ address })
+    }
+
+    public async customerName() {
+        const customerData = Database
+            .from('hoteldatabases')
+            .leftJoin('customers', 'customers.id', '=', 'hoteldatabases.customer_id')
+            .select('customers.customer_name')
+            .orderBy('hoteldatabases.id', 'asc')
+        return customerData
+    }
+
+    public async displayData({ }: HttpContext) {
+        const user = await Hoteldatabase.all()
+        return user
     }
     public async insertData({ request, response }: HttpContext) {
         const dataInsert = new Hoteldatabase()

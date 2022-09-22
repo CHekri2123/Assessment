@@ -26,7 +26,8 @@ Route.post('/sortCustomerDataDesc','CustomersController.sortDescending')
 
 
 
-Route.get('/displayHotelAddress','HoteldatabasesController.addressDisplay')
+Route.get('/displayHotelAddress','HoteldatabasesController.address')
+Route.get('/displayOwnerName','HoteldatabasesController.customerName')
 Route.get('/displayHotelData','HoteldatabasesController.displayData')
 Route.post('/insertHotelData','HoteldatabasesController.insertData')
 Route.put('/updateHotelData/:id','HoteldatabasesController.editData')

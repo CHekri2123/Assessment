@@ -68,17 +68,22 @@
                 <v-icon @click="SortDescending(val='customer_id')">mdi-arrow-down</v-icon>
               </th>
               <th class="text-left">Hotel Name</th>
+              <th class="text-left">Owner</th>
               <th class="text-left">Address</th>
+              <th class="text-left">Pincode</th>
               <th class="text-left">Actions</th>
-            
+
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in hotelTable" :key="row.id">
+            <tr v-for="row,index in hotelTable" :key="row.id">
               <td>{{row.id}}</td>
               <td>{{row.customer_id}}</td>
               <td>{{row.hotel_name}}</td>
-              <td>{{address.address}}</td>
+              <td>{{hotelOwner[index].customer_name}}</td>
+              <td>{{hotelAddress.address[index].street + ", " + hotelAddress.address[index].landmark + ", " +
+              hotelAddress.address[index].city + ", " + hotelAddress.address[index].pincode}}</td>
+              <td>{{row.pincode}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
                   <v-icon small>mdi-pencil</v-icon>
@@ -98,15 +103,15 @@
 <script>
 import axios from 'axios';
 var instanceOfItem;
-var instanceOfItem1;
 export default {
   name: "HotelCrud",
   data() {
     return {
-      address: {},
+      hotelAddress: [],
+      hotelOwner: [],
       id: '',
       customer_id: '',
-      hotel_name:'',
+      hotel_name: '',
       door_no: '',
       street: '',
       landmark: '',
@@ -125,7 +130,7 @@ export default {
 
   mounted() {
     this.read()
-    
+
   },
 
 
@@ -135,6 +140,15 @@ export default {
       axios.get(`http://127.0.0.1:3333/displayHotelData`).then(response => {
         this.hotelTable = response.data
       })
+      axios.get(`http://127.0.0.1:3333/displayHotelAddress`).then(response => {
+        this.hotelAddress = response.data
+      })
+      axios.get(`http://127.0.0.1:3333/displayOwnerName`).then(response => {
+        this.hotelOwner = response.data
+      })
+      this.hotelTable.merge(this.hotelOwner)
+      console.log("Printing addres")
+      console.log(this.hotelTable)
     },
 
     async submit() {
@@ -175,7 +189,7 @@ export default {
       this.boolValue = false;
       this.dialog = true;
       this.submitButton = false;
-      
+
     },
 
     async edit() {
@@ -192,7 +206,7 @@ export default {
       await axios.put(`http://127.0.0.1:3333/updateHotelData/${instanceOfItem.id}`, {
         customer_id: this.customer_id,
         hotel_name: this.hotel_name,
-        door_no : this.door_no,
+        door_no: this.door_no,
         street: this.street,
         landmark: this.landmark,
         city: this.city,
@@ -210,24 +224,24 @@ export default {
     },
 
     async serachEmpDataReciever(input) {
-      const searchPromise = await API.post('http://127.0.0.1:3333/searchHotelData',{'term':input})
+      const searchPromise = await API.post('http://127.0.0.1:3333/searchHotelData', { 'term': input })
       this.customerTable = searchPromise.data
       console.log(input)
     },
 
-    async SortAscending(val){
+    async SortAscending(val) {
       console.log('Up button clicked')
       console.log(val)
-      axios.post(`http://127.0.0.1:3333/sortHotelDataAsc`,{
+      axios.post(`http://127.0.0.1:3333/sortHotelDataAsc`, {
         columnName: val
       }).then(response => {
         this.customerTable = response.data
       })
     },
 
-    async SortDescending(val){
+    async SortDescending(val) {
       console.log('Down button clicked')
-      axios.post(`http://127.0.0.1:3333/sortHotelDataDesc`,{
+      axios.post(`http://127.0.0.1:3333/sortHotelDataDesc`, {
         columnName: val
       }).then(response => {
         this.hotelTable = response.data

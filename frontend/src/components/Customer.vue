@@ -1,7 +1,9 @@
 <template>
   <v-container>
+    <!--Global Search Button -->
     <SearchComponent @empDataSender="serachEmpDataReciever($event)" />
     <template>
+      <!-- Form opens, when plus button on the UI get clicked -->
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-dialog v-model="dialog" max-width="600px">
           <template v-slot:activator="{ on, attrs }">
@@ -19,22 +21,20 @@
                   <v-text-field v-model="id" outlined label="Enter your Id" required>
                   </v-text-field>
                 </v-col>
-                <v-col cols="12" sm="6" md="4">
+                <v-col>
                   <v-text-field v-model="customer_name" outlined label="Enter Customer Name" required>
                   </v-text-field>
                 </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field v-model="branch_name" outlined label="Enter Branch Name" required>
-                  </v-text-field>
-                </v-col>
               </v-row>
+            </v-card-text>
+            <v-card-actions>
               <v-btn color="success" v-model="submitButton" @click="submit()" v-if="boolValue">
                 Submit
               </v-btn>
               <v-btn color="success" v-model="updateButton" @click="edit()" v-else>
                 Update
               </v-btn>
-            </v-card-text>
+            </v-card-actions>
           </v-card>
         </v-dialog>
       </v-form>
@@ -42,7 +42,7 @@
         <v-simple-table fixed-header>
           <thead>
             <tr>
-              <th class="text-left">Id
+              <th class="text-left">Customer Id
                 <v-icon @click="SortAscending(val='id')">mdi-arrow-up</v-icon>
                 <v-icon @click="SortDescending(val='id')">mdi-arrow-down</v-icon>
               </th>
@@ -50,14 +50,18 @@
                 <v-icon @click="SortAscending(val='customer_name')">mdi-arrow-up</v-icon>
                 <v-icon @click="SortDescending(val='customer_name')">mdi-arrow-down</v-icon>
               </th>
+              <th class="text-left">Count of Hotels
+                <v-icon @click="SortCount()">mdi-arrow-up</v-icon>
+              </th>
               <th class="text-left">Actions</th>
-              <th class="text-left">Count of Hotels</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row,index in customerTable" :key="row.id">
               <td>{{row.id}}</td>
               <td>{{row.customer_name}}</td>
+ <!-- countTable contains Data of the count of tables came from backend, where column name is count -->
+              <td>{{countTable[index].count}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
                   <v-icon small>mdi-pencil</v-icon>
@@ -66,7 +70,6 @@
                   <v-icon small>mdi-delete</v-icon>
                 </v-btn>
               </td>
-              <td>{{countTable[index].count}}</td>
             </tr>
           </tbody>
         </v-simple-table>
@@ -77,8 +80,8 @@
 
 <script>
 import axios from 'axios';
+// Here instanceOfItem saves the index of the particular rows of the data when edit button is clicked
 var instanceOfItem;
-console.log("Hi")
 
 export default {
   name: "CustomerCrud",
@@ -110,12 +113,10 @@ export default {
       axios.get(process.env.VUE_APP_GET_LINK).then(response => {
         this.customerTable = response.data
       })
+      // count end point where it gets the data of the count data from the backend.
       axios.get(`http://127.0.0.1:3333/count`).then(response => {
         this.countTable = response.data
       })
-      console.log("Printing count data")
-      console.log(this.countTable.count)
-      
     },
 
     async submit() {
@@ -149,7 +150,7 @@ export default {
     },
 
     async edit() {
-      console.log("update button clicked")
+      console.log("Update button clicked")
       console.log(instanceOfItem)
       instanceOfItem.id = this.id
       instanceOfItem.customer_name = this.customer_name
@@ -193,6 +194,15 @@ export default {
         this.customerTable = response.data
       })
     },
+
+    SortCount(){
+      console.log('Sort button clciked')
+      const a = this.countTable.sort((a,b) => {
+        a.count - b.count
+      })
+      this.countTable = a
+    },
+
   },
 
 }

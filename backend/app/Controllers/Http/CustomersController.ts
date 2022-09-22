@@ -8,7 +8,7 @@ export default class CustomersController {
         const countData = Database
             .from('customers')
             .leftJoin('hoteldatabases', 'customers.id', '=', 'hoteldatabases.customer_id')
-            .groupBy('hoteldatabases.id')
+            .groupBy('customers.id')
             .count('hoteldatabases.customer_id')
         return countData
     }
