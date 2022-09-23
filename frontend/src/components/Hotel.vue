@@ -80,9 +80,9 @@
               <td>{{row.id}}</td>
               <td>{{row.customer_id}}</td>
               <td>{{row.hotel_name}}</td>
-              <td>{{hotelOwner[index].customer_name}}</td>
-              <td>{{hotelAddress.address[index].street + ", " + hotelAddress.address[index].landmark + ", " +
-              hotelAddress.address[index].city + ", " + hotelAddress.address[index].pincode}}</td>
+              <td>{{}}</td>
+              <td>{{hotelAddress[index].door_no + ", " + hotelAddress[index].street + ", " +
+              hotelAddress[index].landmark + ", " + hotelAddress[index].city}}</td>
               <td>{{row.pincode}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+const axios = require('axios').default;
 var instanceOfItem;
 export default {
   name: "HotelCrud",
@@ -137,16 +137,14 @@ export default {
   methods: {
 
     read() {
+
       axios.get(`http://127.0.0.1:3333/displayHotelData`).then(response => {
-        this.hotelTable = response.data
-      })
-      axios.get(`http://127.0.0.1:3333/displayHotelAddress`).then(response => {
-        this.hotelAddress = response.data
+        this.hotelTable = response.data.userData
+        this.hotelAddress = response.data.address
       })
       axios.get(`http://127.0.0.1:3333/displayOwnerName`).then(response => {
         this.hotelOwner = response.data
       })
-      this.hotelTable.merge(this.hotelOwner)
       console.log("Printing addres")
       console.log(this.hotelTable)
     },

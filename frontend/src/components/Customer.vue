@@ -21,6 +21,10 @@
                   <v-text-field v-model="id" outlined label="Enter your Id" required>
                   </v-text-field>
                 </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field v-model="customer_id" outlined label="Enter Customer Id" required>
+                  </v-text-field>
+                </v-col>
                 <v-col>
                   <v-text-field v-model="customer_name" outlined label="Enter Customer Name" required>
                   </v-text-field>
@@ -42,26 +46,26 @@
         <v-simple-table fixed-header>
           <thead>
             <tr>
-              <th class="text-left">Customer Id
+              <th class="text-left">Id
                 <v-icon @click="SortAscending(val='id')">mdi-arrow-up</v-icon>
                 <v-icon @click="SortDescending(val='id')">mdi-arrow-down</v-icon>
               </th>
-              <th class="text-left">Customer Name
+              <th class="text-left">Customer Id
                 <v-icon @click="SortAscending(val='customer_name')">mdi-arrow-up</v-icon>
                 <v-icon @click="SortDescending(val='customer_name')">mdi-arrow-down</v-icon>
               </th>
-              <th class="text-left">Count of Hotels
-                <v-icon @click="SortCount()">mdi-arrow-up</v-icon>
-              </th>
+              <th class="text-left">Customer Name</th>
+              <th class="text-left">Count of Hotels</th>
               <th class="text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row,index in customerTable" :key="row.id">
               <td>{{row.id}}</td>
+              <td>{{row.customer_id}}</td>
               <td>{{row.customer_name}}</td>
  <!-- countTable contains Data of the count of tables came from backend, where column name is count -->
-              <td>{{countTable[index].count}}</td>
+              <td>{{countTable[index].customer_name + " : " + countTable[index].count}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
                   <v-icon small>mdi-pencil</v-icon>
@@ -89,6 +93,7 @@ export default {
     return {
       countTable: [],
       id: '',
+      customer_id: '',
       customer_name: '',
       branch_name: '',
       customerTable: [],
@@ -122,8 +127,8 @@ export default {
     async submit() {
       const sub = await axios.post(process.env.VUE_APP_POST_LINK, {
         id: this.id,
-        customer_name: this.customer_name,
-        branch_name: this.branch_name
+        customer_id: this.customer_id,
+        customer_name: this.customer_name
       });
       console.log('Printing submitted details when submit button pressed')
       console.log(sub);
@@ -141,8 +146,8 @@ export default {
       console.log(instanceOfItem);
       console.log('Pencil button clicked')
       this.id = row.id;
+      this.customer_id = row.customer_id;
       this.customer_name = row.customer_name;
-      this.branch_name = row.branch_name;
       this.boolValue = false;
       this.dialog = true;
       this.submitButton = false;
@@ -153,11 +158,11 @@ export default {
       console.log("Update button clicked")
       console.log(instanceOfItem)
       instanceOfItem.id = this.id
+      instanceOfItem.customer_id = this.customer_id
       instanceOfItem.customer_name = this.customer_name
-      instanceOfItem.branch_name = this.branch_name
       await axios.put(`${process.env.VUE_APP_PUT_LINK}/${instanceOfItem.id}`, {
-        customer_name: this.customer_name,
-        branch_name: this.branch_name
+        customer_id: this.customer_id,
+        customer_name: this.customer_name
       });
       this.$refs.form.reset()
       this.read()
@@ -195,13 +200,6 @@ export default {
       })
     },
 
-    SortCount(){
-      console.log('Sort button clciked')
-      const a = this.countTable.sort((a,b) => {
-        a.count - b.count
-      })
-      this.countTable = a
-    },
 
   },
 

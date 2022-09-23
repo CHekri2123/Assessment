@@ -10,22 +10,33 @@ export default class HoteldatabasesController {
         // return response.json({data})
         const address = await Database
             .from('hoteldatabases')
-            .select('street', 'landmark', 'city', 'pincode')
+            .select('id', 'street', 'landmark', 'city', 'pincode')
         return response.json({ address })
     }
 
     public async customerName() {
         const customerData = Database
             .from('hoteldatabases')
-            .leftJoin('customers', 'customers.id', '=', 'hoteldatabases.customer_id')
-            .select('customers.customer_name')
+            .leftJoin('custs', 'custs.customer_id', '=', 'hoteldatabases.customer_id')
+            .select('custs.customer_name', 'hoteldatabases.hotel_name')
             .orderBy('hoteldatabases.id', 'asc')
         return customerData
     }
 
     public async displayData({ }: HttpContext) {
-        const user = await Hoteldatabase.all()
-        return user
+        let data = await Hoteldatabase.query()
+            .select('*')
+            .select(Database.raw(`json_build_object('door_no', door_no,'street',street,'landmark',landmark,'city',city,'pincode',pincode) as address`))
+            .join('custs', 'custs.customer_id', '=', 'hoteldatabases.customer_id')
+            .then(data => data.map(element => {
+                const data = element.toJSON()
+                return {
+                    ...data,
+                    customer_name: element.$extras.customer_name,
+                    address: element.$extras.address
+                }
+            }))
+        return data
     }
     public async insertData({ request, response }: HttpContext) {
         const dataInsert = new Hoteldatabase()

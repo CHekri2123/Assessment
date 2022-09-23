@@ -15,14 +15,14 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-Route.get('/count','CustomersController.count')
-Route.get('/displayCustomerData','CustomersController.displayData')
-Route.post('/insertCustomerData','CustomersController.inserData')
-Route.put('/updateCustomerData/:id','CustomersController.editData')
-Route.delete('/deleteCustomerData/:id','CustomersController.deleteData')
-Route.post('/searchCustomerData','CustomersController.searchQuery')
-Route.post('/sortCustomerDataAsc','CustomersController.sortAscending')
-Route.post('/sortCustomerDataDesc','CustomersController.sortDescending')
+Route.get('/count','CustsController.count')
+Route.get('/displayCustomerData','CustsController.displayData')
+Route.post('/insertCustomerData','CustsController.inserData')
+Route.put('/updateCustomerData/:id','CustsController.editData')
+Route.delete('/deleteCustomerData/:id','CustsController.deleteData')
+Route.post('/searchCustomerData','CustsController.searchQuery')
+Route.post('/sortCustomerDataAsc','CustsController.sortAscending')
+Route.post('/sortCustomerDataDesc','CustsController.sortDescending')
 
 
 
