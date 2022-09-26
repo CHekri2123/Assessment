@@ -80,9 +80,9 @@
               <td>{{row.id}}</td>
               <td>{{row.customer_id}}</td>
               <td>{{row.hotel_name}}</td>
-              <td>{{}}</td>
-              <td>{{hotelAddress[index].door_no + ", " + hotelAddress[index].street + ", " +
-              hotelAddress[index].landmark + ", " + hotelAddress[index].city}}</td>
+              <td>{{row.customer_name}}</td>
+              <td>{{row.address.door_no + ", " + row.address.street + ", " + row.address.landmark + ", " +
+              row.address.city}}</td>
               <td>{{row.pincode}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
@@ -139,12 +139,9 @@ export default {
     read() {
 
       axios.get(`http://127.0.0.1:3333/displayHotelData`).then(response => {
-        this.hotelTable = response.data.userData
-        this.hotelAddress = response.data.address
+        this.hotelTable = response.data.data
       })
-      axios.get(`http://127.0.0.1:3333/displayOwnerName`).then(response => {
-        this.hotelOwner = response.data
-      })
+
       console.log("Printing addres")
       console.log(this.hotelTable)
     },
@@ -222,8 +219,8 @@ export default {
     },
 
     async serachEmpDataReciever(input) {
-      const searchPromise = await API.post('http://127.0.0.1:3333/searchHotelData', { 'term': input })
-      this.customerTable = searchPromise.data
+      const searchPromise = await axios.post('http://127.0.0.1:3333/searchHotelData', { 'term': input })
+      this.hotelTable = searchPromise.data
       console.log(input)
     },
 

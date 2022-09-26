@@ -1,72 +1,188 @@
 import { HttpContext } from "@adonisjs/core/build/standalone";
-import Database from "@ioc:Adonis/Lucid/Database";
 import Cust from "App/Models/Cust";
+import CustomerValidator from "App/Validators/CustomerValidator";
 
 
 export default class CustsController {
 
-    public async count({ }: HttpContext) {
-        const countData = Database
-            .from('custs')
-            .leftJoin('hoteldatabases', 'custs.customer_id', '=', 'hoteldatabases.customer_id')
-            .groupBy('custs.customer_name')
-            .select('custs.customer_name')
-            .count('hoteldatabases.customer_id')
-        return countData
-    }
-
 
     public async displayData({ }: HttpContext) {
-        const user = await Cust.all()
-        return user
+
+        const user = await Cust.query()
+            .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
+            .select('custs.*')
+            .count('hoteldatabases.customer_id as count')
+            .groupBy('custs.id', 'custs.customer_id', 'custs.customer_name', 'hoteldatabases.customer_id')
+            .orderBy('custs.id')
+
+        const newDataWithCount = user.map(
+
+            (el) => Object.assign(
+
+                {}, el.$attributes, {
+
+                count: el.$extras.count
+
+            }
+            )
+        )
+
+        return {
+
+            data: newDataWithCount
+
+        }
     }
+
     public async inserData({ request, response }: HttpContext) {
+
+        const payLoad = await request.validate(CustomerValidator)
+
         const dataInsert = new Cust();
-        dataInsert.id = request.input('id');
-        dataInsert.customer_id = request.input('customer_id');
-        dataInsert.customer_name = request.input('customer_name');
-        await dataInsert.save()
-        return response.json({ dataInsert })
+
+        dataInsert.id = payLoad['id'];
+
+        dataInsert.customer_id = payLoad['customer_id'];
+
+        dataInsert.customer_name = payLoad['customer_name'];
+
+        await dataInsert.save();
+
+        return response.json({ dataInsert });
+
     }
+
     public async editData({ request }: HttpContext) {
-        const editInsert = await Cust.findByOrFail('id', request.params().id)
-        editInsert.customer_id = request.input('customer_id')
-        editInsert.customer_name = request.input('customer_name')
+
+        const payLoad = await request.validate(CustomerValidator)
+
+        const editInsert = await Cust.findOrFail(request.param('id'))
+
+        editInsert.customer_id = payLoad['customer_id']
+
+        editInsert.customer_name = payLoad['customer_name']
+
         await editInsert.save()
+
         return editInsert
     }
+
     public async deleteData({ request }: HttpContext) {
-        const deleteItem = await Cust.findByOrFail('id', request.params().id)
-        deleteItem.delete()
+
+        const deleteItem = await Cust.findOrFail(request.param('id'))
+
+        await deleteItem.delete()
+
         await deleteItem.save()
+
         return deleteItem
     }
+
     public async searchQuery({ request }: HttpContext) {
-        var data = request.input('term')
-        const searchData = await Database
-            .from('custs')
-            .select('*')
+
+        const data = request.input('term')
+
+        const searchData = await Cust.query()
+
+            .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
+            .select('custs.*')
+            .count('hoteldatabases.customer_id as count')
+            .groupBy('custs.id', 'custs.customer_id', 'custs.customer_name', 'hoteldatabases.customer_id')
+            .orderBy('custs.id')
+
             .where((query) => {
+
                 if (/^[0-9]/.test(data)) {
-                    query.where('customer_id', data)
+
+                    query
+                        .where('custs.id', data)
+                        .orWhere('custs.customer_id', data)
+
                 }
+
             })
+
             .orWhere((query: any) => {
+
                 query
-                    .where("customer_name", "ilike", `%${data}%`)
+                    .where("custs.customer_name", "ilike", `%${data}%`)
+
             })
-        return searchData
+
+        const newSearchData = searchData.map(
+
+            (el) => Object.assign(
+
+                {}, el.$attributes, {
+
+                count: el.$extras.count
+
+            }
+            )
+        )
+
+        return {
+            newSearchData
+        }
     }
 
     public async sortAscending({ request }: HttpContext) {
+
         const columnName = request.input('columnName')
-        const sort = await Database.from('custs').select('*').orderBy(`${columnName}`, `asc`)
-        return sort
+
+        const sort = await Cust.query()
+            .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
+            .select('custs.*')
+            .count('hoteldatabases.customer_id as count')
+            .groupBy('custs.id', 'custs.customer_id', 'custs.customer_name', 'hoteldatabases.customer_id')
+            .orderBy(`${columnName}`, `asc`)
+
+        const newSort = sort.map(
+
+            (el) => Object.assign(
+
+                {}, el.$attributes, {
+
+                count: el.$extras.count
+
+            }
+            )
+        )
+
+        return {
+
+            sort: newSort
+
+        }
     }
 
     public async sortDescending({ request }: HttpContext) {
+
         const columnName = request.input('columnName')
-        const sort = await Database.from('custs').select('*').orderBy(`${columnName}`, `desc`)
-        return sort
+
+        const sort = await Cust.query()
+            .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
+            .select('custs.*')
+            .count('hoteldatabases.customer_id as count')
+            .groupBy('custs.id', 'custs.customer_id', 'custs.customer_name', 'hoteldatabases.customer_id')
+            .orderBy(`${columnName}`, `desc`)
+
+        const newSort = sort.map(
+
+            (el) => Object.assign(
+
+                {}, el.$attributes, {
+
+                count: el.$extras.count
+
+            }
+            )
+        )
+
+        return {
+
+            sort: newSort
+
+        }
     }
 }

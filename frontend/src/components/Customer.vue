@@ -60,12 +60,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row,index in customerTable" :key="row.id">
+            <tr v-for="row in customerTable" :key="row.id">
               <td>{{row.id}}</td>
               <td>{{row.customer_id}}</td>
               <td>{{row.customer_name}}</td>
  <!-- countTable contains Data of the count of tables came from backend, where column name is count -->
-              <td>{{countTable[index].customer_name + " : " + countTable[index].count}}</td>
+              <td>{{row.count}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
                   <v-icon small>mdi-pencil</v-icon>
@@ -116,7 +116,7 @@ export default {
 
     read() {
       axios.get(process.env.VUE_APP_GET_LINK).then(response => {
-        this.customerTable = response.data
+        this.customerTable = response.data.data
       })
       // count end point where it gets the data of the count data from the backend.
       axios.get(`http://127.0.0.1:3333/count`).then(response => {
@@ -176,8 +176,8 @@ export default {
     },
 
     async serachEmpDataReciever(input) {
-      const searchPromise = await API.post('http://127.0.0.1:3333/searchCustomerData', { 'term': input })
-      this.customerTable = searchPromise.data
+      const searchPromise = await axios.post('http://127.0.0.1:3333/searchCustomerData', { 'term': input })
+      this.customerTable = searchPromise.data.newSearchData
       console.log(input)
     },
 
@@ -187,7 +187,7 @@ export default {
       axios.post(`http://127.0.0.1:3333/sortCustomerDataAsc`, {
         columnName: val
       }).then(response => {
-        this.customerTable = response.data
+        this.customerTable = response.data.sort
       })
     },
 
@@ -196,7 +196,7 @@ export default {
       axios.post(`http://127.0.0.1:3333/sortCustomerDataDesc`, {
         columnName: val
       }).then(response => {
-        this.customerTable = response.data
+        this.customerTable = response.data.sort
       })
     },
 
