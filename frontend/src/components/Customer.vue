@@ -64,7 +64,7 @@
               <td>{{row.id}}</td>
               <td>{{row.customer_id}}</td>
               <td>{{row.customer_name}}</td>
- <!-- countTable contains Data of the count of tables came from backend, where column name is count -->
+              <!-- countTable contains Data of the count of tables came from backend, where column name is count -->
               <td>{{row.count}}</td>
               <td>
                 <v-btn fab class="mb-2" small color="cyan" dark @click="update(row)">
@@ -92,6 +92,7 @@ export default {
   data() {
     return {
       countTable: [],
+      appKey: { headers: { appKey: 'To0IoEazcyhqPhgXLkyXlzdmuw3saJmv' } },
       id: '',
       customer_id: '',
       customer_name: '',
@@ -108,97 +109,144 @@ export default {
 
   mounted() {
     this.read()
-
   },
 
 
   methods: {
 
     read() {
-      axios.get(process.env.VUE_APP_GET_LINK).then(response => {
+
+      axios.get(process.env.VUE_APP_SERVER_URL + `/displayCustomerData`, this.appKey).then(response => {
+
         this.customerTable = response.data.data
+
       })
-      // count end point where it gets the data of the count data from the backend.
-      axios.get(`http://127.0.0.1:3333/count`).then(response => {
-        this.countTable = response.data
-      })
+
     },
 
     async submit() {
-      const sub = await axios.post(process.env.VUE_APP_POST_LINK, {
+
+      const sub = await axios.post(process.env.VUE_APP_SERVER_URL + `/insertCustomerData`, {
+
         id: this.id,
         customer_id: this.customer_id,
         customer_name: this.customer_name
+
       });
-      console.log('Printing submitted details when submit button pressed')
-      console.log(sub);
+
       this.read();
+
       this.dialog = false;
+
       this.$refs.form.reset()
+
     },
 
     press() {
+
       this.boolValue = true;
+
     },
 
     async update(row) {
+
       instanceOfItem = row
+
       console.log(instanceOfItem);
+
       console.log('Pencil button clicked')
+
       this.id = row.id;
+
+      console.log(this.id)
+
       this.customer_id = row.customer_id;
+
       this.customer_name = row.customer_name;
+
       this.boolValue = false;
+
       this.dialog = true;
+
       this.submitButton = false;
 
     },
 
     async edit() {
+
       console.log("Update button clicked")
+
       console.log(instanceOfItem)
-      instanceOfItem.id = this.id
-      instanceOfItem.customer_id = this.customer_id
-      instanceOfItem.customer_name = this.customer_name
+
+      console.log(instanceOfItem.id)
+
       await axios.put(`${process.env.VUE_APP_PUT_LINK}/${instanceOfItem.id}`, {
+
         customer_id: this.customer_id,
         customer_name: this.customer_name
+
       });
+
       this.$refs.form.reset()
+
       this.read()
+
       this.dialog = false;
+
     },
 
 
     async deleteData(id) {
+
       await axios.delete(`${process.env.VUE_APP_DELETE_LINK}/${id}`);
+
       this.read();
+
     },
 
     async serachEmpDataReciever(input) {
-      const searchPromise = await axios.post('http://127.0.0.1:3333/searchCustomerData', { 'term': input })
+
+      const searchPromise = await axios.post(process.env.VUE_APP_SERVER_URL + `/searchCustomerData`, { 'term': input })
+
       this.customerTable = searchPromise.data.newSearchData
+
       console.log(input)
+
     },
 
     async SortAscending(val) {
+
       console.log('Up button clicked')
+
       console.log(val)
-      axios.post(`http://127.0.0.1:3333/sortCustomerDataAsc`, {
+
+      axios.post(process.env.VUE_APP_SERVER_URL + `/sortCustomerDataAsc`, {
+
         columnName: val
+
       }).then(response => {
+
         this.customerTable = response.data.sort
+
       })
+
     },
 
     async SortDescending(val) {
+
       console.log('Down button clicked')
-      axios.post(`http://127.0.0.1:3333/sortCustomerDataDesc`, {
+
+      axios.post(process.env.VUE_APP_SERVER_URL + `/sortCustomerDataDesc`, {
+
         columnName: val
+
       }).then(response => {
+
         this.customerTable = response.data.sort
+
       })
     },
+
 
 
   },

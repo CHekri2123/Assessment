@@ -15,8 +15,7 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-Route.get('/count','CustsController.count')
-Route.get('/displayCustomerData','CustsController.displayData')
+Route.get('/displayCustomerData','CustsController.displayData').middleware('MiddleAuth')
 Route.post('/insertCustomerData','CustsController.inserData')
 Route.put('/updateCustomerData/:id','CustsController.editData')
 Route.delete('/deleteCustomerData/:id','CustsController.deleteData')
@@ -26,8 +25,6 @@ Route.post('/sortCustomerDataDesc','CustsController.sortDescending')
 
 
 
-Route.get('/displayHotelAddress','HoteldatabasesController.address')
-Route.get('/displayOwnerName','HoteldatabasesController.customerName')
 Route.get('/displayHotelData','HoteldatabasesController.displayData')
 Route.post('/insertHotelData','HoteldatabasesController.insertData')
 Route.put('/updateHotelData/:id','HoteldatabasesController.editData')

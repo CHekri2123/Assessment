@@ -1,4 +1,5 @@
 import { HttpContext } from "@adonisjs/core/build/standalone";
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Cust from "App/Models/Cust";
 import CustomerValidator from "App/Validators/CustomerValidator";
 
@@ -9,6 +10,7 @@ export default class CustsController {
     public async displayData({ }: HttpContext) {
 
         const user = await Cust.query()
+        
             .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
             .select('custs.*')
             .count('hoteldatabases.customer_id as count')
@@ -52,11 +54,11 @@ export default class CustsController {
 
     }
 
-    public async editData({ request }: HttpContext) {
+    public async editData({ request }:HttpContextContract) {
 
         const payLoad = await request.validate(CustomerValidator)
 
-        const editInsert = await Cust.findOrFail(request.param('id'))
+        const editInsert = await Cust.findByOrFail('id', request.params().id)
 
         editInsert.customer_id = payLoad['customer_id']
 
@@ -82,6 +84,10 @@ export default class CustsController {
 
         const data = request.input('term')
 
+        console.log(typeof data)
+
+        const regx: RegExp = /^[0-9]/
+
         const searchData = await Cust.query()
 
             .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
@@ -92,7 +98,7 @@ export default class CustsController {
 
             .where((query) => {
 
-                if (/^[0-9]/.test(data)) {
+                if (regx.test(data) == true) {
 
                     query
                         .where('custs.id', data)
@@ -100,12 +106,11 @@ export default class CustsController {
 
                 }
 
-            })
+                else {
 
-            .orWhere((query: any) => {
-
-                query
-                    .where("custs.customer_name", "ilike", `%${data}%`)
+                    query
+                        .where('custs.customer_name', 'ilike', '%' + data + '%')
+                }
 
             })
 
@@ -131,6 +136,7 @@ export default class CustsController {
         const columnName = request.input('columnName')
 
         const sort = await Cust.query()
+
             .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
             .select('custs.*')
             .count('hoteldatabases.customer_id as count')
@@ -161,6 +167,7 @@ export default class CustsController {
         const columnName = request.input('columnName')
 
         const sort = await Cust.query()
+
             .leftJoin('hoteldatabases', 'custs.customer_id', 'hoteldatabases.customer_id')
             .select('custs.*')
             .count('hoteldatabases.customer_id as count')

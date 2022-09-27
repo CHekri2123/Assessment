@@ -98,6 +98,9 @@ export default class HoteldatabasesController {
     public async searchQuery({ request }: HttpContext) {
 
         const data = request.input('term')
+
+        const regx: RegExp = /^[0-9]/
+
         const searchData = await Hoteldatabase.query()
 
             .select('hoteldatabases.*')
@@ -107,25 +110,29 @@ export default class HoteldatabasesController {
             .orderBy('hoteldatabases.id')
             .where((query) => {
 
-                if (/^[0-9]/.test(data)) {
+                if (regx.test(data) == true) {
 
                     query
                         .where('hoteldatabases.id', data)
                         .orWhere('hoteldatabases.customer_id', data)
                         .orWhere('pincode', data)
                 }
-            })
-            .orWhere((query: any) => {
-                query
-                    .where("hoteldatabases.hotel_name", "ilike", `%${data}%`)
-                    .orWhere("custs.customer_name", "ilike", `%${data}%`)
+                else {
+                    query
+                        .where("hoteldatabases.hotel_name", "ilike", `%${data}%`)
+                        .orWhere("custs.customer_name", "ilike", `%${data}%`)
+                }
             })
             .then(data => data.map(el => {
+
                 const data = el.toJSON()
+
                 return {
+
                     ...data,
                     customer_name: el.$extras.customer_name,
                     address: el.$extras.address
+
                 }
             }))
 
@@ -153,11 +160,12 @@ export default class HoteldatabasesController {
 
                 }
             }))
-        
-            return sortData
+
+        return sortData
     }
 
     public async sortDescending({ request }: HttpContext) {
+        
         const columnName = request.input('columnName')
 
         let sortData = await Hoteldatabase.query()
@@ -177,8 +185,8 @@ export default class HoteldatabasesController {
 
                 }
             }))
-        
-            return sortData
+
+        return sortData
     }
 
 }

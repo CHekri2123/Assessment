@@ -107,8 +107,6 @@ export default {
   name: "HotelCrud",
   data() {
     return {
-      hotelAddress: [],
-      hotelOwner: [],
       id: '',
       customer_id: '',
       hotel_name: '',
@@ -138,16 +136,22 @@ export default {
 
     read() {
 
-      axios.get(`http://127.0.0.1:3333/displayHotelData`).then(response => {
+      axios.get(process.env.VUE_APP_SERVER_URL + `/displayHotelData`).then(response => {
+
         this.hotelTable = response.data.data
+
       })
 
-      console.log("Printing addres")
+      console.log("Printing hotel table")
+
       console.log(this.hotelTable)
+
     },
 
     async submit() {
-      const sub = await axios.post(`http://127.0.0.1:3333/insertHotelData`, {
+
+      const sub = await axios.post(process.env.VUE_APP_SERVER_URL + `/insertHotelData`, {
+
         id: this.id,
         customer_id: this.customer_id,
         hotel_name: this.hotel_name,
@@ -156,49 +160,67 @@ export default {
         landmark: this.landmark,
         city: this.city,
         pincode: this.pincode
+
       });
-      this.address = sub.data
+
       console.log('Printing submitted details when submit button pressed')
+
       console.log(sub);
+
       this.read();
+
       this.dialog = false;
+
       this.$refs.form.reset()
+
     },
 
     press() {
+
       this.boolValue = true;
+
     },
 
     async update(row) {
+
       instanceOfItem = row
+
       console.log(instanceOfItem);
+
       console.log('Pencil button clicked')
+
       this.id = row.id;
+
       this.customer_id = row.customer_id;
+
       this.hotel_name = row.hotel_name;
+
       this.door_no = row.door_no;
+
       this.street = row.street
+
       this.landmark = row.landmark
+
       this.city = row.city
+
       this.pincode = row.pincode
+
       this.boolValue = false;
+
       this.dialog = true;
+
       this.submitButton = false;
 
     },
 
     async edit() {
+
       console.log("update button clicked")
+
       console.log(instanceOfItem)
-      instanceOfItem.id = this.id
-      instanceOfItem.customer_id = this.customer_id
-      instanceOfItem.hotel_name = this.hotel_name
-      instanceOfItem.door_no = this.door_no
-      instanceOfItem.street = this.street
-      instanceOfItem.landmark = this.landmark
-      instanceOfItem.city = this.city
-      instanceOfItem.pincode = this.pincode
+
       await axios.put(`http://127.0.0.1:3333/updateHotelData/${instanceOfItem.id}`, {
+
         customer_id: this.customer_id,
         hotel_name: this.hotel_name,
         door_no: this.door_no,
@@ -206,40 +228,65 @@ export default {
         landmark: this.landmark,
         city: this.city,
         pincode: this.pincode
+
       });
+
       this.$refs.form.reset()
+
       this.read()
+
       this.dialog = false;
+
     },
 
 
     async deleteData(id) {
+
       await axios.delete(`http://127.0.0.1:3333/deleteHotelData/${id}`);
+
       this.read();
+
     },
 
     async serachEmpDataReciever(input) {
-      const searchPromise = await axios.post('http://127.0.0.1:3333/searchHotelData', { 'term': input })
+
+      const searchPromise = await axios.post(process.env.VUE_APP_SERVER_URL + `/searchHotelData`, { 'term': input })
+
       this.hotelTable = searchPromise.data
+
       console.log(input)
+
     },
 
     async SortAscending(val) {
+
       console.log('Up button clicked')
+
       console.log(val)
-      axios.post(`http://127.0.0.1:3333/sortHotelDataAsc`, {
+
+      axios.post(process.env.VUE_APP_SERVER_URL + `/sortHotelDataAsc`, {
+
         columnName: val
+
       }).then(response => {
-        this.customerTable = response.data
+
+        this.hotelTable = response.data
+
       })
     },
 
     async SortDescending(val) {
+
       console.log('Down button clicked')
-      axios.post(`http://127.0.0.1:3333/sortHotelDataDesc`, {
+
+      axios.post(process.env.VUE_APP_SERVER_URL + `/sortHotelDataDesc`, {
+
         columnName: val
+
       }).then(response => {
+
         this.hotelTable = response.data
+
       })
     },
 

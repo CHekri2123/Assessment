@@ -24,7 +24,6 @@ export default class CustomerValidator {
    *    ```
    */
   public schema = schema.create({
-    id: schema.number(),
     customer_id: schema.number(),
     customer_name: schema.string()
   })
